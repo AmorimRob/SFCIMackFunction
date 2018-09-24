@@ -16,20 +16,21 @@ namespace SCFIFunction
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            var datetime = DateTime.Now.ToString();
+            // parse query parameter
+            string name = req.GetQueryNameValuePairs()
+                .FirstOrDefault(q => string.Compare(q.Key, "name", true) == 0)
+                .Value;
 
-            var mensagem = $"SCFI Mackenzie 2018 - {datetime}";
-
-            if (mensagem == null)
+            if (name == null)
             {
                 // Get request body
                 dynamic data = await req.Content.ReadAsAsync<object>();
-                mensagem = data?.mensagem;
+                name = data?.name;
             }
 
-            return mensagem == null
+            return name == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a name on the query string or in the request body")
-                : req.CreateResponse(HttpStatusCode.OK, mensagem);
+                : req.CreateResponse(HttpStatusCode.OK, "Hello " + name);
         }
     }
 }
