@@ -15,21 +15,21 @@ namespace SCFIFunction
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
+            
+            string clubName = req.GetQueryNameValuePairs()
+                .FirstOrDefault(q => string.Compare(q.Key, "name", true) == 0)
+                .Value;
 
-            var datetime = DateTime.Now.ToString();
-
-            var mensagem = $"SCFI Mackenzie 2018 - {datetime}";
-
-            if (mensagem == null)
+            if (clubName == null)
             {
-                // Get request body
                 dynamic data = await req.Content.ReadAsAsync<object>();
-                mensagem = data?.mensagem;
+                clubName = data?.name;
             }
 
-            return mensagem == null
+            clubName = $"SFCI 2018 - {clubName}";
+            return clubName == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a name on the query string or in the request body")
-                : req.CreateResponse(HttpStatusCode.OK, mensagem);
+                : req.CreateResponse(HttpStatusCode.OK, clubName);
         }
     }
 }
